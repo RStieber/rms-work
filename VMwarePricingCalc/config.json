@@ -1,0 +1,14 @@
+{
+    "pricing": {
+        "standardPerYear": 50,
+        "vvfPerYear": 135,
+        "vcfPerYear": 350,
+        "vsanPerTibPerYear": 210
+    },
+    "restrictions": {
+        "minCpuPerCore": 16,
+        "vvfVsanTib": 0.1,
+        "vcfVsanTib": 1
+    },
+    "yearsToCalculate": [1,3,5]
+}
