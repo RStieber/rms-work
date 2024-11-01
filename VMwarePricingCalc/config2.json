@@ -1,0 +1,60 @@
+{
+    "editions": [
+        {
+            "name": "std",
+            "description": "VMware vSphere Standard",
+            "perYearPerCoreCost": 50,
+            "vsanEligible": false,
+            "vsanTibCostPerYear": 0,
+            "vsanTibPerCore": 0,
+            "vsanFullCostIfOverTibPerCore": false,
+            "threeYearCoreDiscount": 1,
+            "fiveYearCoreDiscount": 1,
+            "threeYearVsanDiscount": 1,
+            "fiveYearVsanDiscount": 1
+        },
+        {
+            "name": "ent-plus",
+            "description": "VMware vSphere Enterprise Plus",
+            "perYearPerCoreCost": 100,
+            "vsanEligible": false,
+            "vsanTibCostPerYear": 0,
+            "vsanTibPerCore": 0,
+            "vsanFullCostIfOverTibPerCore": false,
+            "threeYearCoreDiscount": 1,
+            "fiveYearCoreDiscount": 1,
+            "threeYearVsanDiscount": 1,
+            "fiveYearVsanDiscount": 1
+        },
+        {
+            "name": "vvf",
+            "description": "VMware vSphere Foundation",
+            "perYearPerCoreCost": 135,
+            "vsanEligible": true,
+            "vsanTibCostPerYear": 210,
+            "vsanTibPerCore": 0.1,
+            "vsanFullCostIfOverTibPerCore": true,
+            "threeYearCoreDiscount": 1,
+            "fiveYearCoreDiscount": 1,
+            "threeYearVsanDiscount": 1,
+            "fiveYearVsanDiscount": 1
+        },
+        {
+            "name": "vcf",
+            "description": "vSphere Cloud Foundation",
+            "perYearPerCoreCost": 350,
+            "vsanEligible": true,
+            "vsanTibCostPerYear": 210,
+            "vsanTibPerCore": 1,
+            "vsanFullCostIfOverTibPerCore": false,
+            "threeYearCoreDiscount": 1,
+            "fiveYearCoreDiscount": 1,
+            "threeYearVsanDiscount": 1,
+            "fiveYearVsanDiscount": 1
+        }
+    ],
+    "restrictions": {
+        "minCpuPerCore": 16
+    },
+    "yearsToCalculate": [1,3,5]
+}
