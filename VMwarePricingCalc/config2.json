@@ -84,7 +84,7 @@
             "perYearPerCoreCost": 190,
             "vsanEligible": true,
             "vsanTibCostPerYear": 210,
-            "vsanTibPerCore": 0.1,
+            "vsanTibPerCore": 0.25,
             "vsanFullCostIfOverTibPerCore": true,
             "threeYearCoreDiscount": 0.79,
             "fiveYearCoreDiscount": 0.79,
