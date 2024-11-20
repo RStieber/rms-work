@@ -33,7 +33,7 @@
             "vsanEligible": true,
             "vsanTibCostPerYear": 210,
             "vsanTibPerCore": 0.25,
-            "vsanFullCostIfOverTibPerCore": true,
+            "vsanFullCostIfOverTibPerCore": false,
             "threeYearCoreDiscount": 0.79,
             "fiveYearCoreDiscount": 0.79,
             "threeYearVsanDiscount": 1,
