@@ -1,4 +1,4 @@
-﻿$csvLocation = (Read-Host "Please enter the full path to the CSV with NIC Names and MAC Addresses").TrimStart("`"")
+﻿$csvLocation = (Read-Host "Please enter the full path to the CSV with NIC Names and MAC Addresses").Trim("`"")
 
 $csv = Import-CSV $csvLocation
 $netAdapters = Get-NetAdapter
