@@ -7,7 +7,7 @@ if($answer.ToUpper() -eq "Y") {
     $nics = Read-Host "Enter Ethernet Adapter names to include in the VM switch as a comma separated list (ex: VM 1,VM 2,VM 3)"
     $ip = Read-Host "Host static IP address"
     $cidr = Read-Host "CIDR notation for subnet size (ex: enter 24 for 255.255.255.0 netmask)"
-    $gateway = Read-Host "Host default dateway address"
+    $gateway = Read-Host "Host default gateway address"
     $vlan = Read-Host "VLAN for host (optional, leave blank if none)"
     $dns1 = Read-Host "First DNS server IP address"
     $dns2 = Read-Host "Second DNS server IP address (optional, leave blank if none)"
