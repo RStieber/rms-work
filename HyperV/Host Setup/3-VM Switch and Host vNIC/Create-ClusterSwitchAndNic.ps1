@@ -27,4 +27,7 @@ if($answer.ToUpper() -eq "Y") {
     else {
         $null = $netAdapter | New-NetIPAddress -IPAddress $ip -PrefixLength $cidr
     }
+
+    Write-Host -ForegroundColor Cyan "Disabling IPv6 on all NICs"
+    Get-NetAdapterBinding -ComponentID "ms_tcpip6" | where Enabled -eq $true | Disable-NetAdapterBinding -ComponentID "ms_tcpip6"
 }

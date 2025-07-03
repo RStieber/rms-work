@@ -25,4 +25,7 @@ if($answer.ToUpper() -eq "Y") {
     $netAdapter = Get-NetAdapter | Where {$_.Name -eq "vEthernet (OS_Mgmt_vNIC)"}    
     $null = $netAdapter | New-NetIPAddress -IPAddress $ip -PrefixLength $cidr -DefaultGateway $gateway
     $null = $netAdapter | Set-DnsClientServerAddress -ServerAddresses $dns1,$dns2
+
+    Write-Host -ForegroundColor Cyan "Disabling IPv6 on all NICs"
+    Get-NetAdapterBinding -ComponentID "ms_tcpip6" | where Enabled -eq $true | Disable-NetAdapterBinding -ComponentID "ms_tcpip6"
 }

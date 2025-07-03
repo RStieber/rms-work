@@ -16,3 +16,6 @@ foreach ($line in $csv) {
         Write-Host -ForegroundColor Yellow "No Net Adapter found with MAC address '$mac', skipping"
     }
 }
+
+Write-Host -ForegroundColor Cyan "Disabling IPv6 on all NICs"
+Get-NetAdapterBinding -ComponentID "ms_tcpip6" | where Enabled -eq $true | Disable-NetAdapterBinding -ComponentID "ms_tcpip6"
