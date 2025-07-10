@@ -1,0 +1,25 @@
+[NewRequest]
+Subject="CN=<serverFQDN>"
+Key Exportable = TRUE  ; Private key is exportable, leave if exporting for another machine, otherwise change to FALSE
+HashAlgorithm = SHA256
+KeyLength = 2048  ; (2048 or 4096 as per Organization security requirement.)
+KeySpec = 1  ; AT_KEYEXCHANGE
+KeyUsage = 0xf0  ; Digital Signature, Key Encipherment
+MachineKeySet = TRUE ; The key belongs to the local computer account
+ProviderName = "Microsoft RSA SChannel Cryptographic Provider"
+ProviderType = 12
+KeyAlgorithm = RSA
+
+[Extensions]
+; SANs are included by using the following text format. Note 2.5.29.17 is the OID for a SAN extension.
+
+2.5.29.17 = "{text}"
+_continue_ = "dns=<serverFQDN>&"
+_continue_ = "dns=<serverShortName>&"
+_continue_ = "dns=<clusterFQDN>&"
+_continue_ = "dns=<clusterShortName>&"
+
+; Not required if using a template with this defined
+[EnhancedKeyUsageExtension]
+OID = 1.3.6.1.5.5.7.3.1  ; Server Authentication
+OID = 1.3.6.1.5.5.7.3.2  ; Client Authentication
