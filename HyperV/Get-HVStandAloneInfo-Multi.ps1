@@ -1,40 +1,66 @@
-Function Get-HyperVInfo {
-	[CmdletBinding(SupportsShouldProcess = $true)]
-	Param(
-	[string]$OutputPath,
-	[string]$HostName
-	)
-
-	Get-VM -ComputerName $HostName | ForEach-Object {
-		$vhd = Get-VHD -ComputerName $_.ComputerName -VmId $_.VmId
-		$networkAdapter = Get-VMNetworkAdapter -VM $_
-
-		$vhd | Add-Member -NotePropertyName "Name" -NotePropertyValue $_.Name
-		$vhd | Add-Member -NotePropertyName "State" -NotePropertyValue $_.State
-		$vhd | Add-Member -NotePropertyName "ProcessorCount" -NotePropertyValue $_.ProcessorCount
-		$vhd | Add-Member -NotePropertyName "MemoryStartup" -NotePropertyValue $_.MemoryStartup
-		$vhd | Add-Member -NotePropertyName "NetworkAdapters" -NotePropertyValue $networkAdapter.IPAddresses
-		$vhd | Add-Member -NotePropertyName "AccessVlanId" -NotePropertyValue ($networkAdapter | Get-VMNetworkAdapterVlan).AccessVlanId
-		$vhd
-		} | Select-Object @{label='VM Name';expression={$_.Name}}, @{label='VM State';expression={$_.State}}, `
-	@{label='vCPU';expression={$_.ProcessorCount}}, `
-	@{label='vMem (GB)';expression={$_.MemoryStartup/1gb -as [int]}}, `
-	@{label='IP Addresses';expression={$_.NetworkAdapters}}, `
-    @{label='Host Name';expression={$_.ComputerName}}, `
-	@{label='VLAN Id';expression={$_.AccessVlanId}}, Path, VhdFormat, VhdType, `
-	@{label='Size On Physical Disk (GB)';expression={$_.FileSize/1gb -as [int]}}, `
-	@{label='Max Disk Size (GB)';expression={$_.Size/1gb -as [int]}}, `
-	@{label='Remaining Space (GB)';expression={($_.Size/1gb - $_.FileSize/1gb) -as [int]}}, `
-	@{label='Disk Identifier';expression={$_.DiskIdentifier}} `
-	| Export-Csv -Path $outputPath -NoTypeInformation -Force -Append
-
-	}
-
 $outPath = Read-Host "Please enter Full output path (.csv extension)"
-$hostsInput = Read-Host "Please enter the FQDN of each host, separated by commas (eg: Host1.fabrikam.com,Host2.fabrikam.com,...)"
+$hostList = Read-Host "Please enter the FQDN of each host, separated by commas (eg: Host1.fabrikam.com,Host2.fabrikam.com,...)"
 
-$hostsArray = $hostsInput.Split(",")
+$vmOutput = New-Object System.Collections.ArrayList
+
+Write-Host -ForegroundColor Yellow "This may take a few moments, please wait"
+
+$hostsArray = $hostList.Split(",")
 foreach($vmHost in $hostsArray) {
-    Write-Host -ForegroundColor Cyan "Gathering VM info from '$vmHost'..."
-	Get-HyperVInfo -OutputPath $outPath.Trim("`"") -HostName $vmHost
+
+    Write-Host -foregroundcolor Cyan "Gathering VM info from '$vmHost' and writing it to '$outPath'"
+
+    $vms = Get-VM -ComputerName $vmHost
+
+    foreach($vm in $vms) {
+	    $vhds = Get-VHD -VmId $vm.vmId -ComputerName $vmHost
+    
+        $vhdTotalProvisionedGb = 0
+        $vhdTotalInUseGb = 0
+        $vhdTotalRemainingGb = 0
+        $numberOfDisks = 0
+    
+        foreach($vhd in $vhds) {
+            $vhdTotalProvisionedGb += $vhd.size/1gb -as [int]
+            $vhdTotalInUseGb += $vhd.FileSize/1gb -as [int]
+            $vhdTotalRemainingGb += ($vhd.size/1gb - $vhd.fileSize/1gb) -as [int]
+            $numberOfDisks++
+        }
+
+        $vlans = $null
+        $ipAddresses = $null
+
+        if($vm.NetworkAdapters.Count -gt 1) {
+            foreach($netAdapter in $vm.NetworkAdapters) {
+                $vlans += if($netAdapter.VlanSetting.AccessVlanId -eq 0) { '<native>; ' } else { "$($netAdapter.VlanSetting.AccessVlanId); " }
+                if($netAdapter.IPAddresses) {
+                    foreach($ip in $netAdapter.IpAddresses) {
+                        $ipAddresses += "$ip; "
+                        } 
+                    }
+                else {
+                    $ipAddresses += "<none>; "
+                }
+            }
+        }
+        else {
+            $vlans = if($vm.NetworkAdapters.VlanSetting.AccessVlanId -eq 0) { '<native>; ' } else { "$($vm.NetworkAdapters.VlanSetting.AccessVlanId); " }
+            if($vm.NetworkAdapters.IPAddresses) {
+                foreach($ip in $vm.NetworkAdapters.IpAddresses) {
+                    $ipAddresses += "$ip; "
+                    }            
+                }
+            else {
+                $ipAddresses += "<none>; "
+            }
+        }
+
+        $null = $vmOutput.Add((New-Object PSObject -Property @{'VM_Name' = $vm.Name; 'VM_State' = $vm.State; 'Host_Name'=$vm.ComputerName; 'IsClustered'=$vm.IsClustered.ToString(); 'vCPU'=$vm.ProcessorCount; 'RAM_GB'=($vm.MemoryStartup/1Gb -as [int]); `
+                                                  'NumberOfDisks'=$numberOfDisks; 'TotalSizeOnDiskGb'=$vhdTotalProvisionedGb; 'TotalInUseGb'=$vhdTotalInUseGb; 'TotalRemainingGb'=$vhdTotalRemainingGb; `
+                                                  'NumberOfNics'=$vm.NetworkAdapters.count; 'VLANs'=$vlans; 'IpAddresses'=$ipAddresses}))
+    }
 }
+
+$vmOutput | Select VM_Name,VM_state,Host_Name,IsClustered,vCPU,RAM_GB,NumberOfDisks,TotalSizeOnDiskGb,TotalInUseGb,TotalRemainingGb,NumberOfNics,VLANs,IpAddresses | Export-Csv -Path $outPath -NoTypeInformation
+
+Write-Host -ForegroundColor Green "File has been written to '$outPath'"
