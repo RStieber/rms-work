@@ -3,6 +3,12 @@
 foreach($vmName in $vmNames.Split(",")) {
     $vm = Get-VM $vmName
 
+    Write-Host -ForegroundColor Cyan "Setting existing NIC(s) to allow MAC Spoofing and Teaming"
+    $nics = $vm | Get-VMNetworkAdapter
+    foreach($existing in $nics) {
+        $existing | Set-VMNetworkAdapter -MacAddressSpoofing On -AllowTeaming On
+    }
+
     $nicsToAdd = 0
     $nicsToAdd = Read-Host "Enter # of NICs to add to $vmName"
 
